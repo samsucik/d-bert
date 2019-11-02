@@ -183,11 +183,13 @@ def main():
     set_seed(args.seed)
     # sd = torch.load(args.cache_file)
 
-    logger.error(args.gpt2_model, args.cache_dir)
+    logger.error(args.gpt2_model)
+    print(args.cache_dir)
     tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
     logger.error(tokenizer)
-    return
     model = GPT2LMHeadModel.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
+    logger.error(model)
+    return
     if args.reset: model.apply(model.init_weights)
     sos_idx = init_sos(model)
     if not args.use_sos: sos_idx = None

@@ -1,5 +1,6 @@
 from collections import Counter
 import argparse
+import os
 
 from pytorch_transformers import GPT2Tokenizer, TransfoXLTokenizer
 from torch.distributions.categorical import Categorical
@@ -113,6 +114,7 @@ class SampleBatch(object):
 ARGS = [
     OptionEnum.SEED.value.default(1111), # match AWD-LSTM
     opt('--cache-file', type=str, default='aol-cache.pt'),
+    opt('--cache-dir', type=str),
     opt('--save', type=str, default='prefix_sampler.pt'),
     opt('--gpt2-model', type=str, default='gpt2'),
     opt('--transfo-model', type=str, default='transfo-xl-wt103'),
@@ -124,11 +126,12 @@ def main():
     parser = argparse.ArgumentParser()
     add_dict_options(parser, ARGS)
     args = parser.parse_args()
+    print(args)
     set_seed(args.seed)
     sd = torch.load(args.cache_file)
 
     if args.model_type == 'gpt2':
-        tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2_model)
+        tokenizer = GPT2Tokenizer.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
         encode = tokenizer.encode
         decode = lambda x: tokenizer.decoder[x]
     else:

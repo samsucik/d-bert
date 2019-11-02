@@ -5,6 +5,7 @@ import functools
 import math
 import random
 import time
+import os
 
 from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel, AdamW, WarmupLinearSchedule
 from torch.distributions.categorical import Categorical
@@ -181,15 +182,14 @@ def main():
     add_dict_options(parser, ARGS)
     args = parser.parse_args()
     set_seed(args.seed)
-    # sd = torch.load(args.cache_file)
+    sd = torch.load(args.cache_file)
 
     logger.error(args.gpt2_model)
-    print(args.cache_dir)
-    tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
+    logger.error(args.cache_dir)
+    tokenizer = GPT2Tokenizer.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model), cache_dir=args.cache_dir)
     logger.error(tokenizer)
-    model = GPT2LMHeadModel.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
+    model = GPT2LMHeadModel.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model), cache_dir=args.cache_dir)
     logger.error(model)
-    return
     if args.reset: model.apply(model.init_weights)
     sos_idx = init_sos(model)
     if not args.use_sos: sos_idx = None

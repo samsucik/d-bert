@@ -2,6 +2,7 @@ from collections import Counter
 import argparse
 import random
 import sys
+import os
 
 from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel, TransfoXLTokenizer, TransfoXLLMHeadModel, \
     BertTokenizer, BertForMaskedLM
@@ -25,6 +26,7 @@ ARGS = [
     opt('--transfo', action='store_true'),
     opt('--bert', action='store_true'),
     opt('--resume', type=str),
+    opt('--cache-dir', type=str),
     opt('--prefix-file', type=str),
     opt('--num-samples', type=int, default=1500000),
     opt('--paired', action='store_true'),
@@ -56,8 +58,8 @@ def main():
         tokenizer = BertTokenizer.from_pretrained(args.bert_model)
         model = BertForMaskedLM.from_pretrained(args.bert_model)
     else:
-        tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2_model)
-        model = GPT2LMHeadModel.from_pretrained(args.gpt2_model)
+        tokenizer = GPT2Tokenizer.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
+        model = GPT2LMHeadModel.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
         init_sos(model)
     if args.resume: model.load_state_dict(torch.load(args.resume, map_location=lambda s, l: s))
     if not args.simple_sample: model = nn.DataParallel(model)

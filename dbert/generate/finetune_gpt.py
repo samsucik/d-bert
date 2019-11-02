@@ -1,4 +1,5 @@
 from collections import Counter
+import logging
 import argparse
 import functools
 import math
@@ -16,6 +17,7 @@ from .args import add_dict_options, opt, OptionEnum
 from .utils import set_seed, dual_print
 from .data import tokenize_batch
 
+logger = logging.getLogger(__name__)
 
 EOS_TOKEN = '<|endoftext|>'
 
@@ -179,9 +181,12 @@ def main():
     add_dict_options(parser, ARGS)
     args = parser.parse_args()
     set_seed(args.seed)
-    sd = torch.load(args.cache_file)
+    # sd = torch.load(args.cache_file)
 
+    logger.error(args.gpt2_model, args.cache_dir)
     tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
+    logger.error(tokenizer)
+    return
     model = GPT2LMHeadModel.from_pretrained(args.gpt2_model, cache_dir=args.cache_dir)
     if args.reset: model.apply(model.init_weights)
     sos_idx = init_sos(model)

@@ -20,6 +20,7 @@ ARGS = [
     opt('--column2', type=str, default='question2'),
     opt('--filter-label', type=str),
     opt('--label-column', type=str, default='label'),
+    opt('--dataset_name', type=str, required=True),
     opt('--word-level', action='store_true')
 ]
 
@@ -35,7 +36,7 @@ def main():
         splits = save_dict['splits']
     else:
         kwargs = dict(filter_label=args.filter_label, label_column=args.label_column, 
-            column=args.column, column1=args.column1, column2=args.column2)
+            column=args.column, column1=args.column1, column2=args.column2, dataset_name=args.dataset_name)
         splits_fn = SingleSentenceDataset.splits if args.dataset_type == 'single-sentence' else SingleSentenceDataset.pair_splits
         splits = splits_fn(args.data_dir, **kwargs)
         save_dict = dict(splits=splits)

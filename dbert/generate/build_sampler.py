@@ -92,7 +92,7 @@ class SampleBatch(object):
         queries = torch.LongTensor(queries).cuda()
         self.model.eval()
         with torch.no_grad():
-            output = self.model(queries)[0]
+            output = self.model(queries)[0][...,:-1] # ignoring the last element because it's the logit of the SOS token
         preds = output[torch.arange(0, queries.size(0)).long(), torch.tensor(list(map(len, raw_decode))) - 1]
         texts = []
         fin_texts = []

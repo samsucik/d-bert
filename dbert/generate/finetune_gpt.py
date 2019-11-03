@@ -18,8 +18,6 @@ from .args import add_dict_options, opt, OptionEnum
 from .utils import set_seed, dual_print
 from .data import tokenize_batch
 
-logger = logging.getLogger(__name__)
-
 EOS_TOKEN = '<|endoftext|>'
 
 
@@ -184,12 +182,8 @@ def main():
     set_seed(args.seed)
     sd = torch.load(args.cache_file)
 
-    logger.error(args.gpt2_model)
-    logger.error(args.cache_dir)
     tokenizer = GPT2Tokenizer.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model), cache_dir=args.cache_dir)
-    logger.error(tokenizer)
     model = GPT2LMHeadModel.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model), cache_dir=args.cache_dir)
-    logger.error(model)
     if args.reset: model.apply(model.init_weights)
     sos_idx = init_sos(model)
     if not args.use_sos: sos_idx = None

@@ -4,7 +4,7 @@ import random
 import sys
 import os
 
-from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel, TransfoXLTokenizer, TransfoXLLMHeadModel, \
+from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, TransfoXLTokenizer, TransfoXLLMHeadModel, \
     BertTokenizer, BertForMaskedLM
 from tqdm import tqdm
 import torch
@@ -27,6 +27,7 @@ ARGS = [
     opt('--bert', action='store_true'),
     opt('--resume', type=str),
     opt('--cache-dir', type=str),
+    opt('--finetuned-model', type=str),
     opt('--prefix-file', type=str),
     opt('--num-samples', type=int, default=1500000),
     opt('--paired', action='store_true'),
@@ -47,7 +48,9 @@ def init_sos(model):
 def main():
     parser = argparse.ArgumentParser()
     add_dict_options(parser, ARGS)
+    print(ARGS)
     args = parser.parse_args()
+    print(args)
     set_seed(args.seed)
 
     if args.prefix_file: prefix_sampler = torch.load(args.prefix_file)
@@ -59,8 +62,11 @@ def main():
         model = BertForMaskedLM.from_pretrained(args.bert_model)
     else:
         tokenizer = GPT2Tokenizer.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
-        model = GPT2LMHeadModel.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
-        init_sos(model)
+        # model = GPT2LMHeadModel.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
+        config = GPT2Config.from_pretrained(os.path.join(args.cache_dir, args.gpt2_model))
+        config.vocab_size += 1
+        model = GPT2LMHeadModel.from_pretrained(args.finetuned_model, config=config)
+        # init_sos(model)
     if args.resume: model.load_state_dict(torch.load(args.resume, map_location=lambda s, l: s))
     if not args.simple_sample: model = nn.DataParallel(model)
     model.cuda()

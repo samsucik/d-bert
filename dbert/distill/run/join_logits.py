@@ -8,9 +8,10 @@ import torch
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--logits_file", type=str)
+    parser.add_argument("--logits_file", required=True, type=str)
     parser.add_argument("--n_logits", type=int, default=2)
     parser.add_argument("--dataset_file", required=True, type=str)
+    parser.add_argument("--augmentation_file", required=True, type=str)
     parser.add_argument("--format", default="tsv", type=str, choices=["tsv", "csv", "txt"])
     parser.add_argument("--output_file", type=str)
     parser.add_argument("--dataset_name", type=str, default="SST-2")
@@ -22,19 +23,22 @@ def main():
     sep = "\t" if args.format == "tsv" else ","
     if args.format == "txt":
         sep = "magicmagic12312312358124"
-    try:
-        ds = pd.read_csv(args.dataset_file, sep=sep, quoting=3, keep_default_na=False, skip_blank_lines=False).astype(str)
-    except:
-        ds = defaultdict(list)
-        with open(args.dataset_file) as f:
-            lines = f.readlines()[1:]
-        for line in lines:
-            a, b = line.split('\t', 1)
-            ds['question1'].append(a.strip())
-            ds['question2'].append(b.strip())
-            ds['is_duplicate'].append(0)
-        ds = pd.DataFrame(ds)
-    logits = torch.cat(list(map(torch.Tensor, torch.load(args.logits_file)))).squeeze() if args.logits_file else None
+    
+    if args.dataset_name == "CoLA":
+        dataset_columns = ["id", "label", "star-mark", "sentence"]
+    else:
+        raise ValueError("Unrecognised dataset name: {}".format(args.dataset_name))
+
+    dataset = pd.read_csv(args.dataset_file, sep=sep, quoting=3, names=dataset_columns, keep_default_na=False, skip_blank_lines=False).astype(str)
+    dataset = dataset[["sentence"]]
+    aug_dataset = pd.read_csv(args.augmentation_file, sep=sep, quoting=3, names=["sentence"], 
+                              keep_default_na=False, skip_blank_lines=False,
+                              converters={"sentence": lambda s: s[2:]}).astype(str)
+    ds = pd.concat([dataset, aug_dataset], ignore_index=True)
+
+    logits = torch.load(args.logits_file, map_location=torch.device("cpu"))
+    logits = logits["logits"]
+    
     logits_columns = [f"logits_{idx}" for idx in range(args.n_logits)]
     if args.dataset_name == "QQP":
         column_order = ["is_duplicate", "question1", "question2"] + logits_columns
@@ -42,7 +46,7 @@ def main():
     elif args.dataset_name == 'qnli':
         column_order = ['index', 'question', 'sentence', 'label'] + logits_columns
         ds['index'] = 0
-    elif args.dataset_name == 'cola':
+    elif args.dataset_name == 'CoLA':
         column_order = ['label', 'sentence'] + logits_columns
     elif args.dataset_name == 'sts':
         logits_columns = ['score']

@@ -132,5 +132,33 @@
     }, {
     	"name": "num_train_epochs",
 	    "type": "int"
+    }, {
+        "name": "vectors_dir",
+        "type": "str",
+        "help": "Directory with pre-trained embeddings."
+    }, {
+        "name": "vectors_file",
+        "type": "str",
+        "help": "File within vectors_dir containing the pre-trained embeddings."
+    }, {
+        "name": "logits_path",
+        "type": "str",
+        "help": "Obsolete argument in distillation into BiLSTM."
+    }, {
+        "name": "optimizer",
+        "type": "str",
+        "help": "Optimizer (irrelevant when distilling into BiLSTM)."
+    }, {
+        "name": "n_feature_maps",
+        "type": "int",
+        "help": "Number of feature maps (only relevant for CNNs, not for distilling into BiLSTM)."
+    }, {
+        "name": "early_stop",
+        "action": "store_true",
+        "help": "Early stopping (irrelevant in distillation)."
+    }, {
+        "name": "output_channel",
+        "type": "int",
+        "help": "Output channel (only for CNNs)."
     }
 ]

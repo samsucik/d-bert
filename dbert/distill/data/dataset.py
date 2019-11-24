@@ -81,10 +81,20 @@ class CoLADataset(RegisteredDataset, name="cola"):
 
     @classmethod
     def splits(cls, folder_path, train="train.tsv", dev="dev.tsv", test="test.tsv"):
-        fields = [("label", cls.LABEL_FIELD), ("sentence", cls.TEXT_FIELD), ("logits_0", cls.LOGITS_0),
-            ("logits_1", cls.LOGITS_1)]
-        return super(CoLADataset, cls).splits(folder_path, train=train, validation=dev, test=test, format="tsv", 
-            fields=fields, skip_header=True)
+        # label   sentence    logits_0    logits_1
+        train_fields = [("label", cls.LABEL_FIELD), ("sentence", cls.TEXT_FIELD), 
+                        ("logits_0", cls.LOGITS_0), ("logits_1", cls.LOGITS_1)]
+        # gj04  1       The sailors rode the breeze clear of the rocks.
+        dev_fields = [("id", None), ("label", cls.LABEL_FIELD), ("acceptability_marker", None), 
+                      ("sentence", cls.TEXT_FIELD)]
+        # index   sentence
+        test_fields = [("id", None), ("sentence", cls.TEXT_FIELD)]
+
+        train_set = super(CoLADataset, cls).splits(folder_path, train=train, format="tsv", fields=train_fields, skip_header=True)[0]
+        dev_set = super(CoLADataset, cls).splits(folder_path, validation=dev, format="tsv", fields=dev_fields, skip_header=False)[0]
+        test_set = super(CoLADataset, cls).splits(folder_path, test=test, format="tsv", fields=test_fields, skip_header=True)[0]
+
+        return train_set, dev_set, test_set
 
     @classmethod
     def iters(cls, path, vectors_name, vectors_cache, batch_size=64, vectors=None,

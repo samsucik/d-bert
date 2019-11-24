@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 
 from torch.nn.utils import clip_grad_norm_
 from torch.optim import Adadelta
@@ -68,12 +69,8 @@ def evaluate(model, ds_iter, criterion, export_eval_labels=False):
 def main():
     args = read_args(default_config="confs/kim_cnn_sst2.json")
     set_seed(args.seed)
-    try:
-        os.makedirs(args.workspace)
-    except:
-        pass
+    print(args)
     torch.cuda.deterministic = True
-
     dataset_cls = find_dataset(args.dataset_name)
     training_iter, dev_iter, test_iter = dataset_cls.iters(args.dataset_path, args.vectors_file, args.vectors_dir,
         batch_size=args.batch_size, device=args.device, train=args.train_file, dev=args.dev_file, test=args.test_file)

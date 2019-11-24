@@ -12,5 +12,7 @@
     "batch_size": 50,
     "weight_decay": 1e-3,
     "mode": "rand",
-    "epochs": 30
+    "epochs": 30,
+    "optimizer": "",
+    "early_stop": false
 }

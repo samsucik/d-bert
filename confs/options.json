@@ -160,5 +160,9 @@
         "name": "output_channel",
         "type": "int",
         "help": "Output channel (only for CNNs)."
+    }, {
+        "name": "weight_decay",
+        "type": "float",
+        "help": "Weight decay coefficient (ignored when distilling into BiLSTM)"
     }
 ]

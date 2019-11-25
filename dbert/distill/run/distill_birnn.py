@@ -79,7 +79,8 @@ def evaluate(params: SimpleNamespace):
     params.model.eval()
     preds, targets = None, None
     for batch in params.dataset:
-        logits = params.model(batch.sentence)
+        with torch.no_grad():
+            logits = params.model(batch.sentence)
         labels_pred = logits.max(1)[1]
         if preds is None:
             preds = labels_pred.detach().cpu().numpy()
@@ -131,8 +132,8 @@ def main():
     model = mod.BiRNNModel(args).to(args.device)
     args.dataset = None
     distiller = Distiller(params=args,
-                          dataloader_train=training_iter,
-                          dataloader_dev=dev_iter,
+                          dataset_train=training_iter,
+                          dataset_eval=dev_iter,
                           student=model,
                           evaluate_fn=evaluate,
                           student_type="LSTM")

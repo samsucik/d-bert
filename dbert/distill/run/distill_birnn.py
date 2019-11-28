@@ -57,9 +57,8 @@ def extend_args(args):
     defaults = {
         "gradient_accumulation_steps": 1,
         "use_hard_labels": False,
-        # "warmup_prop": 0,
         "max_steps": -1,
-        "log_interval": 50,
+        "log_interval": 100,
         "evaluate_during_training": True,
         "checkpoint_interval": -1,
         "n_gpu": 0 if args.device == "cpu" else 1
@@ -75,7 +74,6 @@ def main():
     set_seed(args.seed)
     args = extend_args(args)
     print(args)
-    exit(0)
     torch.cuda.deterministic = True
     dataset_cls = find_dataset(args.dataset_name)
     training_iter, dev_iter, test_iter = dataset_cls.iters(args.dataset_path, args.vectors_file, args.vectors_dir,

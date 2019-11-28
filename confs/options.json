@@ -164,5 +164,9 @@
         "name": "weight_decay",
         "type": "float",
         "help": "Weight decay coefficient (ignored when distilling into BiLSTM)"
+    }, {
+        "name": "warmup_prop",
+        "type": "float",
+        "help": "Fraction of warmup steps -- training steps during which lr will be annealed from 0 to the target"
     }
 ]

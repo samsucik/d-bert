@@ -30,13 +30,12 @@ def main():
     add_dict_options(parser, ARGS)
     args = parser.parse_args()
     set_seed(args.seed)
-
     if args.resume:
         save_dict = torch.load(args.resume)
         splits = save_dict['splits']
     else:
         kwargs = dict(filter_label=args.filter_label, label_column=args.label_column, 
-            column=args.column, column1=args.column1, column2=args.column2, dataset_name=args.dataset_name)
+            column=args.column, column1=args.column1, column2=args.column2, dataset=args.dataset_name)
         splits_fn = SingleSentenceDataset.splits if args.dataset_type == 'single-sentence' else SingleSentenceDataset.pair_splits
         splits = splits_fn(args.data_dir, **kwargs)
         save_dict = dict(splits=splits)

@@ -6,6 +6,7 @@ import math
 import random
 import time
 import os
+from tqdm import tqdm
 
 from pytorch_transformers import GPT2Tokenizer, GPT2LMHeadModel, AdamW, WarmupLinearSchedule
 from torch.distributions.categorical import Categorical
@@ -221,13 +222,13 @@ def main():
         evaluate(test_loader, split_encode=False)
         return
 
-    for epoch in range(args.num_train_epochs):
+    for epoch in tqdm(range(args.num_train_epochs), desc="Epoch"):
         epoch += 1
         total_loss = 0
         total_words = 0
         total_n = 0
         batch_idx = 0
-        for batch in train_loader:
+        for batch in tqdm(train_loader, desc="Batch"):
             model.train()
             _, queries = batch
             total_words += sum(len(space_tokenize(x)) for x in queries)

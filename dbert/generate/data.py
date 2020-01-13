@@ -37,7 +37,6 @@ class SingleSentenceDataset(tud.Dataset):
             test_file='test.tsv', column='sentence',
             filter_label=None, label_column='label', dataset="CoLA", **kwargs):
         dfs = [os.path.join(folder, x) for x in (train_file, dev_file, test_file)]
-        print(dfs)
         if dataset == "CoLA":
             # [print(df.columns) for df in dfs]
             # dfs = [(df.iloc[:,[1, 3]] if len(df.columns) > 2 else df) for df in dfs]
@@ -50,6 +49,9 @@ class SingleSentenceDataset(tud.Dataset):
             dfs_train_dev = [pd.read_csv(df, sep='\t', quoting=3, error_bad_lines=True, names=col_names, header=0, keep_default_na=False).astype(str) for df in dfs[:2]]
             dfs_test = pd.read_csv(dfs[2], sep='\t', quoting=3, error_bad_lines=True, names=["_", "sentence"], header=0, keep_default_na=False).astype(str)
             dfs = dfs_train_dev + [dfs_test]
+        elif dataset == "Sara":
+            col_names = ["label", "sentence"]
+            dfs = [pd.read_csv(df, sep='\t', quoting=3, error_bad_lines=True, names=col_names, keep_default_na=False).astype(str) for df in dfs]
         else:
             dfs = [pd.read_csv(df, sep='\t', quoting=3, error_bad_lines=True, keep_default_na=False).astype(str) for df in dfs]
         if filter_label is not None:

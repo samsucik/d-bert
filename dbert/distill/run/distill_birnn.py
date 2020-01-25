@@ -76,12 +76,33 @@ def main():
     print(args)
     torch.cuda.deterministic = True
     dataset_cls = find_dataset(args.dataset_name)
-    training_iter, dev_iter, test_iter = dataset_cls.iters(args.dataset_path, args.vectors_file, args.vectors_dir,
-        batch_size=args.batch_size, device=args.device, train=args.train_file, dev=args.dev_file, test=args.test_file)
-
+    # print(dataset_cls)
+    training_iter, dev_iter, test_iter = dataset_cls.iters(path=args.dataset_path, vectors_name=args.vectors_file, 
+        vectors_cache=args.vectors_dir, batch_size=args.batch_size, device=args.device, train=args.train_file, 
+        dev=args.dev_file, test=args.test_file)
+    # exit(0)
     args.dataset = training_iter.dataset
     model = mod.BiRNNModel(args).to(args.device)
+    print(model)
+    [print(p) for p in model.state_dict()]
+    embeddings_to_load = {"static_embed.weight": torch.Tensor(105, 300).uniform_(-0.25, 0.25)}
+    param_keys = model.load_state_dict(embeddings_to_load, strict=False)
+    loaded_params = [p for p in model.state_dict() if p not in param_keys[0]]
+    num_loaded_params = sum([model.state_dict()[p].numel() for p in loaded_params])
+    num_all_params = sum([p.numel() for n, p in model.state_dict().items()])
+    print("Loaded {} parameters (out of total {}) into: {}".format(num_loaded_params, num_all_params, loaded_params))
+    exit(0)
+    # [print(n, p.size(), p.numel()) for n, p in model.named_parameters()]
     args.dataset = None
+    print(training_iter)
+    for batch in training_iter:
+        print("batch", batch)
+        # print("sents, lens", batch.sentence)
+        # print("sents", batch.sentence[0])
+        print("lens", batch.sentence[1])
+        # print("first sent", batch.sentence[0][0])
+        # break
+    exit(0)
     distiller = Distiller(params=args,
                           dataset_train=training_iter,
                           dataset_eval=dev_iter,

@@ -130,7 +130,7 @@ def sample_query(model, tokenizer, text, n=128):
 
 
 def init_sos(model):
-    embedding = model.transformer.wte.weight
+    embedding = model.transformer.wte.weight-decay
     sos_tensor = torch.Tensor(1, embedding.data.size(1)).uniform_(-0.1, 0.1).to(embedding.data.device)
     embedding.data = torch.cat((embedding.data, sos_tensor)) # <eos> is <|endoftext|>
     return embedding.data.size(0) - 1

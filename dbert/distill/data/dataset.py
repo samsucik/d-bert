@@ -100,10 +100,29 @@ class CoLADataset(RegisteredDataset, name="cola"):
     def iters(cls, path, vectors_name, vectors_cache, batch_size=64, vectors=None,
               unk_init=uniform_unk_init(), device="cuda:0", train="train.tsv", dev="dev.tsv", test="test.tsv"):
         if vectors is None:
+            print("Creating vectors...")
             vectors = Vectors(name=vectors_name, cache=vectors_cache, unk_init=unk_init)
+            print(vectors)
+            print(len(vectors.stoi))
+            # print(len(vectors.itos))
+        # exit(0)
 
         train, val, test = cls.splits(path, train=train, dev=dev, test=test)
-        cls.TEXT_FIELD.build_vocab(train, val, test, vectors=vectors)
+        print("splits ready, now creating vocab...")
+        cls.TEXT_FIELD.build_vocab(train, vectors=vectors, min_freq=1) # previously, the code used vel and test set too, but that's unfair
+        # print(len(cls.TEXT_FIELD.vocab.itos))
+        # print(cls.TEXT_FIELD.vocab.itos)
+        # print(len(cls.TEXT_FIELD.vocab.itos)) # 243120 (min_freq=1)
+        # print(cls.TEXT_FIELD.vocab.vectors.shape)
+        # print(cls.TEXT_FIELD.vocab.stoi)
+        # exit(0)
+        print(train.shape)
+        print(train)
+        for ex in train:
+            print("example", ex.sentence)
+            # print("sents, lens", batch.sentence)
+            # print("sents", batch.sentence[0])
+            # print("first sent", batch.sentence[0][0])
         return Iterator.splits((train, val, test), batch_size=batch_size, repeat=False, 
             sort_within_batch=False, device=device, sort=False)
 
